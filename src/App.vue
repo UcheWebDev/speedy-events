@@ -4,13 +4,13 @@
     <div class="palm-leaf right"></div>
     <div class="content">
       <div class="header">
-        <h3>LobEnt PRESENTS</h3>
-        <h1>NIGERIA</h1>
-        <h2>Independence Day</h2>
+        <h3>Book Tickets</h3>
+        <h1>Canada</h1>
+        <h2>Socials & Events</h2>
       </div>
       <div class="main-content">
         <div class="image-container">
-          <img src="./assets/event.jpg" alt="Event image" class="event-image" />
+          <img src="./assets/event.jpeg" alt="Event image" class="event-image" />
         </div>
         <div class="event-details">
           <p class="date">SUNDAY <span>OCT 1ST</span></p>
@@ -210,7 +210,7 @@ const closeModal = () => {
 
 .header h2 {
   font-size: 36px;
-  margin-top: -15px;
+  margin-top: -5px;
   font-style: italic;
   color: #f0f0f0;
   animation: fadeInUp 1s ease-out;
@@ -247,7 +247,7 @@ const closeModal = () => {
   padding: 30px;
   border-radius: 10px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-  margin-top: -200px;
+  /* margin-top: -200px; */
   margin-left: 80px;
 }
 
