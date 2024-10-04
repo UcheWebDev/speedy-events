@@ -5,24 +5,30 @@
     <div class="content">
       <div class="header">
         <h3>Book Tickets</h3>
-        <h1>Canada</h1>
-        <h2>Socials & Events</h2>
+        <span class="fire-text">OMOKU RAVE PARTY</span>
+        <h2>Beach Edition</h2>
       </div>
       <div class="main-content">
         <div class="image-container">
-          <img src="./assets/event.jpeg" alt="Event image" class="event-image" />
+          <img
+            src="./assets/event.jpeg"
+            alt="Event image"
+            class="event-image"
+          />
         </div>
         <div class="event-details">
-          <p class="date">SUNDAY <span>OCT 1ST</span></p>
-          <p class="djs">DJ SNOOB x DJ KATTY</p>
-          <p class="location">123 MAINSTREET TANGGULUN CITY - LOBSIDE PUB</p>
-          <p class="info">DOORS OPEN AT 10:00 PM - FREE DRINK</p>
+          <p class="date">1ST <span>NOV .</span> 2024</p>
+          <!-- <p class="djs fire-text">OMOKU RAVE PARTY</p> -->
+          <p class="location">
+            H H HOTELS & APARTMENTS OMUKU ONELGA RIVERS STATE
+          </p>
+          <p class="info">POOL PARTY 2 PM - 6 PM</p>
           <div class="ticket-types">
             <h3>Ticket Types</h3>
             <ul>
-              <li>VIP: ₦5,000</li>
-              <li>Regular: ₦2,000</li>
-              <li>Early Bird: ₦1,500 (before Sep 15)</li>
+              <li>Early Bird : ₦2500</li>
+              <li>Regular : ₦2,000</li>
+              <li>VVIP : ₦30,000</li>
             </ul>
           </div>
           <!-- Book Now Button -->
@@ -39,101 +45,209 @@
     <div v-if="showBookingModal" class="modal-overlay" @click="closeModal">
       <div class="modal-content" @click.stop>
         <h2>Book Your Tickets</h2>
-        <form @submit.prevent="bookTickets">
+        <form @submit.prevent="bookTickets" v-if="formStep">
           <div class="form-group">
-            <label for="full-name">Full Name</label>
+            <label for="name">Name</label>
             <input
               type="text"
-              id="full-name"
-              class="form-control"
-              v-model="fullName"
-              placeholder="Enter fullname"
-              required
+              v-model="form.name"
+              id="name"
+              placeholder="Enter your name"
+              @blur="validateField('name')"
             />
-          </div>
-          <div class="form-group">
-            <label for="ticket-type">Ticket Type</label>
-            <select
-              id="ticket-type"
-              v-model="selectedTicketType"
-              class="form-select"
-            >
-              <option value="VIP">VIP - ₦5,000</option>
-              <option value="Regular">Regular - ₦2,000</option>
-              <option value="Early Bird">
-                Early Bird - ₦1,500 (before Sep 15)
-              </option>
-            </select>
+            <span v-if="errors.name" class="error">{{ errors.name }}</span>
           </div>
 
           <div class="form-group">
             <label for="email">Email</label>
             <input
               type="email"
+              v-model="form.email"
               id="email"
-              class="form-control"
-              v-model="email"
-              required
-              placeholder="Enter email"
+              placeholder="Enter your email"
+              @blur="validateField('email')"
             />
+            <span v-if="errors.email" class="error">{{ errors.email }}</span>
           </div>
 
-          <!-- Payment Type Section -->
+          <!-- Ticket Type Section -->
           <div class="form-group">
-            <label>Payment Type</label>
-            <div class="payment-grid">
-              <div>
-                <input
-                  type="radio"
-                  id="credit-card"
-                  value="Credit Card"
-                  v-model="selectedPaymentType"
-                />
-                <label for="credit-card">Crypto</label>
-              </div>
-
-              <div>
-                <input
-                  type="radio"
-                  id="bank-transfer"
-                  value="Bank Transfer"
-                  v-model="selectedPaymentType"
-                />
-                <label for="bank-transfer">Bank Transfer</label>
-              </div>
-              <div>
-                <input
-                  type="radio"
-                  id="cash"
-                  value="Cash"
-                  v-model="selectedPaymentType"
-                />
-                <label for="cash">Cash</label>
-              </div>
-            </div>
+            <label>Ticket Type</label>
+            <select
+              v-model="selectedTicketType"
+              @change="validateField('ticketType')"
+            >
+              <option value="" disabled>Select Ticket Type</option>
+              <option value="early bird">EARLY BIRD</option>
+              <option value="Regular">Regular</option>
+              <option value="VVIP">VVIP</option>
+            </select>
+            <span v-if="errors.ticketType" class="error">{{
+              errors.ticketType
+            }}</span>
           </div>
 
-          <button type="submit" class="submit-btn">Confirm Booking</button>
+          <button type="submit" class="submit-btn mt-3" @click="submitForm">
+            Confirm Booking
+          </button>
         </form>
-        <button class="close-btn" @click="closeModal">Close</button>
+
+        <!-- Account Number Section -->
+        <div v-if="accountStep" class="account-number">
+          <div class="payment-container">
+            <div class="pay-header">
+              <div class="logo">≡</div>
+              <div class="email">{{ form.email }}</div>
+            </div>
+            <div class="amount text-center">Pay NGN {{ amount }}</div>
+            <div class="transfer-info">
+              <p class="email">
+                Click on the button below to share payment evidence
+              </p>
+
+              <div class="bank-info">
+                <h3>OPay</h3>
+                <div class="account-number">
+                  {{ accountNumber }}
+
+                  <span class="copy-icon" @click="copyAccountNumber">📋</span>
+                </div>
+              </div>
+              <div class="expires">Ordu Ejerulor Dickson</div>
+            </div>
+            <button class="confirm-button" @click="openWhatsAppLink">
+              I've sent the money
+            </button>
+          </div>
+        </div>
+
+        <!-- <button class="close-btn" @click="closeModal">Close</button> -->
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+/*eslint-disable*/
+import { ref, computed } from "vue";
 
-const selectedTicketType = ref("VIP");
-const fullName = ref("");
-const email = ref("");
+// Computed property to check if the form is valid
+const isFormValid = computed(() => {
+  return (
+    form.value.name !== "" &&
+    form.value.email !== "" &&
+    selectedTicketType.value !== "" &&
+    errors.value.name === "" &&
+    errors.value.email === "" &&
+    errors.value.ticketType === ""
+  );
+});
+
+const form = ref({
+  name: "",
+  email: "",
+});
+
+const email = ref("someone@somail.com");
+const amount = ref(null);
+// const bankName = ref("Zenith Bank");
+const accountNumber = ref("9166829361");
+
+const copyAccountNumber = () => {
+  navigator.clipboard.writeText(accountNumber.value);
+  alert("Account number copied to clipboard!");
+};
+
+const confirmTransfer = () => {
+  alert("Transfer confirmed!");
+};
+
+const selectedTicketType = ref("Regular");
+const phoneNumber = "+2349166829361"; // Your WhatsApp number in international format
+const preFilledMessage = `Payments for ${selectedTicketType.value} ticket`; // Pre-filled message
+
+const formStep = ref(true);
+const accountStep = ref(false);
 
 // Ref for modal visibility state
 const showBookingModal = ref(false);
+const errors = ref({
+  name: "",
+  email: "",
+  ticketType: "",
+  paymentType: "",
+});
 
 // Close the modal
 const closeModal = () => {
   showBookingModal.value = false;
+};
+
+// Validation function for each field
+const validateField = (field) => {
+  if (field === "name") {
+    errors.value.name = form.value.name === "" ? "Name is required." : "";
+  }
+
+  if (field === "email") {
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    if (form.value.email === "") {
+      errors.value.email = "Email is required.";
+    } else if (!emailPattern.test(form.value.email)) {
+      errors.value.email = "Email is invalid.";
+    } else {
+      errors.value.email = "";
+    }
+  }
+
+  if (field === "ticketType") {
+    errors.value.ticketType =
+      selectedTicketType.value === "" ? "Please select a ticket type." : "";
+  }
+
+  // if (field === "paymentType") {
+  //   errors.value.paymentType =
+  //     selectedPaymentType.value === "" ? "Please select a payment type." : "";
+  // }
+};
+
+const submitForm = () => {
+  // Validate all fields before submitting
+  validateField("name");
+  validateField("email");
+  validateField("ticketType");
+  // validateField("paymentType");
+
+  if (isFormValid.value) {
+    console.log(selectedTicketType.value);
+    switch (selectedTicketType.value) {
+      case "early bird":
+        amount.value = 2500;
+        break;
+      case "Regular":
+        amount.value = 5000;
+        break;
+      case "VVIP":
+        amount.value = 30000;
+        break;
+    }
+    formStep.value = false;
+    accountStep.value = true;
+
+    // You can add actual form submission logic here
+  } else {
+    console.log("Form is incomplete.");
+    formStep.value = true;
+    accountStep.value = false;
+  }
+};
+
+// Function to open the WhatsApp link
+const openWhatsAppLink = () => {
+  const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+    preFilledMessage
+  )}`;
+  window.open(whatsappLink, "_blank"); // Opens WhatsApp link in a new tab/window
 };
 </script>
 
@@ -141,7 +255,7 @@ const closeModal = () => {
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap");
 
 .flyer {
-  background: linear-gradient(135deg, #004d00, #006400);
+  background-color: rgba(0, 0, 0, 0.6);
   color: white;
   padding: 40px;
   font-family: "Poppins", sans-serif;
@@ -206,6 +320,14 @@ const closeModal = () => {
   -webkit-text-fill-color: transparent;
   text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
   animation: scaleIn 1.5s ease-out;
+}
+
+.header span {
+  font-size: 80px;
+  font-weight: bold;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 10px;
 }
 
 .header h2 {
@@ -419,6 +541,150 @@ const closeModal = () => {
   border: none;
   font-size: 18px;
   cursor: pointer;
+}
+
+.account-number h3 {
+  margin-bottom: 10px;
+}
+
+.account-number p {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.error {
+  color: red;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+/* .payment-container {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  max-width: 100%;
+  margin: 20px auto;
+  padding: 25px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+} */
+
+.pay-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.logo {
+  font-size: 28px;
+  color: #4a90e2;
+  font-weight: bold;
+}
+
+.email {
+  font-size: 14px;
+  color: #757575;
+}
+
+.amount {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 25px;
+  color: #333;
+}
+
+.transfer-info {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.transfer-info p {
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 15px;
+}
+
+.bank-info {
+  background-color: #f7f9fc;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.bank-info h3 {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.account-number {
+  font-size: 22px;
+  font-weight: bold;
+  color: #4a90e2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.copy-icon {
+  cursor: pointer;
+  margin-left: 10px;
+  font-size: 18px;
+  color: #4a90e2;
+  transition: color 0.3s ease;
+}
+
+.copy-icon:hover {
+  color: #3a7bc8;
+}
+
+.expires {
+  font-size: 14px;
+  color: #888;
+  margin-top: 15px;
+}
+
+.confirm-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #00e600;
+  color: #111;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.confirm-button:hover {
+  background-color: #00e600;
+}
+
+.fire-text {
+  /* height: 300px; */
+  width: 100%;
+  background-image: url("https://dl.dropbox.com/s/r2s8s2r17wi0xm6/flame.png?dl=0");
+  background-position: 0 -1000px;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: fire 4s linear infinite;
+}
+
+/* h1 {
+  color: #fff;
+  font-size: 80px;
+  text-align: center;
+} */
+
+@keyframes fire {
+  0% {
+    background-position: 0% -50%;
+  }
+  100% {
+    background-position: 0% -25%;
+  }
 }
 
 @keyframes fadeInDown {
