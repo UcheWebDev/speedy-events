@@ -28,7 +28,7 @@
             <ul>
               <li>Early Bird : ₦2500</li>
               <li>Regular : ₦5000</li>
-              <li>VVIP : ₦30,000</li>
+              <li>VVIP REDROOM : ₦30,000</li>
             </ul>
           </div>
           <!-- Book Now Button -->
@@ -76,11 +76,12 @@
             <select
               v-model="selectedTicketType"
               @change="validateField('ticketType')"
+              class="form-select"
             >
               <option value="" disabled>Select Ticket Type</option>
               <option value="early bird">EARLY BIRD</option>
-              <option value="Regular">Regular</option>
-              <option value="VVIP">VVIP</option>
+              <option value="Regular">REGULAR</option>
+              <option value="VVIP">VVIP REDROOM</option>
             </select>
             <span v-if="errors.ticketType" class="error">{{
               errors.ticketType
