@@ -27,7 +27,7 @@
             <h3>Ticket Types</h3>
             <ul>
               <li>Early Bird : ₦2500</li>
-              <li>Regular : ₦2,000</li>
+              <li>Regular : ₦5000</li>
               <li>VVIP : ₦30,000</li>
             </ul>
           </div>
